@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Car } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Car, Users } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Cliente, TipoDocumento } from '../packages/domain/entities/Cliente';
+import { Cliente } from '../packages/domain/entities/Cliente';
 import { ClienteService } from '../packages/application/services/ClienteService';
 import { ClienteRepository } from '../packages/infra/repositories/ClienteRepository';
 import { formatDate } from '../lib/utils';

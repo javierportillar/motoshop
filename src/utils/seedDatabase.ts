@@ -24,7 +24,12 @@ export async function initializeDatabase() {
       
       // Seed clientes
       for (const cliente of seedClientes) {
-        await clientesStore.setItem(cliente.id, cliente);
+        // Convertir fechas a objetos Date si vienen como strings
+        const clienteWithDates = {
+          ...cliente,
+          fechaRegistro: new Date(cliente.fechaRegistro),
+        };
+        await clientesStore.setItem(cliente.id, clienteWithDates);
       }
 
       // Seed vehículos
@@ -34,7 +39,14 @@ export async function initializeDatabase() {
       });
 
       for (const vehiculo of seedVehiculos) {
-        await vehiculosStore.setItem(vehiculo.id, vehiculo);
+        // Convertir fechas a objetos Date si vienen como strings
+        const vehiculoWithDates = {
+          ...vehiculo,
+          fechaRegistro: new Date(vehiculo.fechaRegistro),
+          soatVence: vehiculo.soatVence ? new Date(vehiculo.soatVence) : undefined,
+          tecnomecanicaVence: vehiculo.tecnomecanicaVence ? new Date(vehiculo.tecnomecanicaVence) : undefined,
+        };
+        await vehiculosStore.setItem(vehiculo.id, vehiculoWithDates);
       }
 
       // Seed inventario
@@ -54,7 +66,14 @@ export async function initializeDatabase() {
       });
 
       for (const orden of seedOrdenes) {
-        await ordenesStore.setItem(orden.id, orden);
+        // Convertir fechas a objetos Date si vienen como strings
+        const ordenWithDates = {
+          ...orden,
+          fechaIngreso: new Date(orden.fechaIngreso),
+          fechaEstimadaEntrega: orden.fechaEstimadaEntrega ? new Date(orden.fechaEstimadaEntrega) : undefined,
+          fechaEntregaReal: orden.fechaEntregaReal ? new Date(orden.fechaEntregaReal) : undefined,
+        };
+        await ordenesStore.setItem(orden.id, ordenWithDates);
       }
 
       // Seed líneas de servicio
@@ -84,7 +103,13 @@ export async function initializeDatabase() {
       });
 
       for (const recordatorio of seedRecordatorios) {
-        await recordatoriosStore.setItem(recordatorio.id, recordatorio);
+        // Convertir fechas a objetos Date si vienen como strings
+        const recordatorioWithDates = {
+          ...recordatorio,
+          fechaProgramada: recordatorio.fechaProgramada ? new Date(recordatorio.fechaProgramada) : undefined,
+          fechaEnvio: recordatorio.fechaEnvio ? new Date(recordatorio.fechaEnvio) : undefined,
+        };
+        await recordatoriosStore.setItem(recordatorio.id, recordatorioWithDates);
       }
 
       console.log('Base de datos inicializada correctamente');

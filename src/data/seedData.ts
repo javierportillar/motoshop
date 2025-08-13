@@ -146,7 +146,7 @@ export const seedInventario: Inventario[] = [
   {
     id: uuidv4(),
     sku: 'LL-001',
-    descripción: 'Llanta Trasera 100/90-18',
+    descripcion: 'Llanta Trasera 100/90-18',
     categoriaProducto: 'Llantas',
     stock: 4,
     stockMin: 3,

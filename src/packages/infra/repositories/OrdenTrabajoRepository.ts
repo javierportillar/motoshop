@@ -25,9 +25,14 @@ export class OrdenTrabajoRepository extends BaseRepository<OrdenTrabajo> {
   }
 
   async create(ordenData: OrdenTrabajoCreate): Promise<OrdenTrabajo> {
+    // Generar ID único para la orden
+    const currentYear = new Date().getFullYear();
+    const ordersCount = (await this.getAll()).length + 1;
+    const otId = `OT-${currentYear}-${ordersCount.toString().padStart(3, '0')}`;
+    
     const orden: OrdenTrabajo = {
       ...ordenData,
-      id: uuidv4(),
+      id: otId,
       fechaIngreso: new Date(),
       estado: 'Recepción',
       fotosUrl: [],
