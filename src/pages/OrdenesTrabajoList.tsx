@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Search, Eye, Edit, FileText } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { OrdenTrabajo, EstadoOT } from '../packages/domain/entities/OrdenTrabajo';
-import { OrdenTrabajoService } from '../packages/application/services/OrdenTrabajoService';
-import { OrdenTrabajoRepository } from '../packages/infra/repositories/OrdenTrabajoRepository';
-import { formatDate, formatCurrency } from '../lib/utils';
-
-const ordenTrabajoService = new OrdenTrabajoService(new OrdenTrabajoRepository());
+import { EstadoOT } from '../packages/domain/entities/OrdenTrabajo';
+import { useAppContext } from '../context/AppContext';
+import { formatDate } from '../lib/utils';
 
 const estadoColors: Record<EstadoOT, string> = {
   'Recepción': 'bg-gray-100 text-gray-800',
@@ -23,26 +20,9 @@ const estadoColors: Record<EstadoOT, string> = {
 };
 
 export function OrdenesTrabajoList() {
-  const [ordenes, setOrdenes] = useState<OrdenTrabajo[]>([]);
+  const { ordenes, vehiculos } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEstado, setSelectedEstado] = useState<EstadoOT | 'Todas'>('Todas');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadOrdenes();
-  }, []);
-
-  const loadOrdenes = async () => {
-    try {
-      setLoading(true);
-      const ordenesData = await ordenTrabajoService.listar();
-      setOrdenes(ordenesData);
-    } catch (error) {
-      console.error('Error cargando órdenes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filteredOrdenes = ordenes.filter(orden => {
     const matchesSearch = searchQuery === '' || 
@@ -57,15 +37,10 @@ export function OrdenesTrabajoList() {
     'Todas', 'Recepción', 'Diagnóstico', 'Cotizado', 'Aprobado', 'EnProceso', 'Listo', 'Entregado'
   ];
 
-  if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Cargando órdenes...</div>
-        </div>
-      </div>
-    );
-  }
+  const getVehiculoInfo = (vehiculoId: string) => {
+    const vehiculo = vehiculos.find(v => v.id === vehiculoId);
+    return vehiculo ? `${vehiculo.marca} ${vehiculo.lineaModelo} - ${vehiculo.placa}` : 'Vehículo no encontrado';
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -126,7 +101,7 @@ export function OrdenesTrabajoList() {
                 <div className="flex-1">
                   <CardTitle className="text-lg">{orden.id}</CardTitle>
                   <p className="text-sm text-gray-600 mt-1">
-                    Vehículo ID: {orden.vehiculoId.slice(0, 8)}...
+                    {getVehiculoInfo(orden.vehiculoId)}
                   </p>
                 </div>
                 <div className="flex space-x-2">
@@ -150,7 +125,7 @@ export function OrdenesTrabajoList() {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Ingreso:</span>
-                  <span className="text-sm">{formatDate(orden.fechaIngreso)}</span>
+                  <span className="text-sm">{formatDate(new Date(orden.fechaIngreso))}</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -166,7 +141,7 @@ export function OrdenesTrabajoList() {
                 {orden.fechaEstimadaEntrega && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Entrega estimada:</span>
-                    <span className="text-sm">{formatDate(orden.fechaEstimadaEntrega)}</span>
+                    <span className="text-sm">{formatDate(new Date(orden.fechaEstimadaEntrega))}</span>
                   </div>
                 )}
                 

@@ -1,75 +1,35 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Cliente } from '../packages/domain/entities/Cliente';
 import { Vehiculo } from '../packages/domain/entities/Vehiculo';
 import { OrdenTrabajo } from '../packages/domain/entities/OrdenTrabajo';
+import { initialClientes, initialVehiculos, initialOrdenes } from '../data/initialData';
 
-interface AppState {
+interface AppContextType {
   clientes: Cliente[];
+  setClientes: (clientes: Cliente[] | ((prev: Cliente[]) => Cliente[])) => void;
   vehiculos: Vehiculo[];
+  setVehiculos: (vehiculos: Vehiculo[] | ((prev: Vehiculo[]) => Vehiculo[])) => void;
   ordenes: OrdenTrabajo[];
-  loading: boolean;
-  error: string | null;
+  setOrdenes: (ordenes: OrdenTrabajo[] | ((prev: OrdenTrabajo[]) => OrdenTrabajo[])) => void;
 }
 
-type AppAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_CLIENTES'; payload: Cliente[] }
-  | { type: 'SET_VEHICULOS'; payload: Vehiculo[] }
-  | { type: 'SET_ORDENES'; payload: OrdenTrabajo[] }
-  | { type: 'ADD_CLIENTE'; payload: Cliente }
-  | { type: 'UPDATE_CLIENTE'; payload: Cliente }
-  | { type: 'DELETE_CLIENTE'; payload: string };
-
-const initialState: AppState = {
-  clientes: [],
-  vehiculos: [],
-  ordenes: [],
-  loading: false,
-  error: null,
-};
-
-function appReducer(state: AppState, action: AppAction): AppState {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload };
-    case 'SET_ERROR':
-      return { ...state, error: action.payload };
-    case 'SET_CLIENTES':
-      return { ...state, clientes: action.payload };
-    case 'SET_VEHICULOS':
-      return { ...state, vehiculos: action.payload };
-    case 'SET_ORDENES':
-      return { ...state, ordenes: action.payload };
-    case 'ADD_CLIENTE':
-      return { ...state, clientes: [...state.clientes, action.payload] };
-    case 'UPDATE_CLIENTE':
-      return {
-        ...state,
-        clientes: state.clientes.map(c => 
-          c.id === action.payload.id ? action.payload : c
-        ),
-      };
-    case 'DELETE_CLIENTE':
-      return {
-        ...state,
-        clientes: state.clientes.filter(c => c.id !== action.payload),
-      };
-    default:
-      return state;
-  }
-}
-
-const AppContext = createContext<{
-  state: AppState;
-  dispatch: React.Dispatch<AppAction>;
-} | null>(null);
+const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [clientes, setClientes] = useLocalStorage<Cliente[]>('taller-clientes', initialClientes);
+  const [vehiculos, setVehiculos] = useLocalStorage<Vehiculo[]>('taller-vehiculos', initialVehiculos);
+  const [ordenes, setOrdenes] = useLocalStorage<OrdenTrabajo[]>('taller-ordenes', initialOrdenes);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{
+      clientes,
+      setClientes,
+      vehiculos,
+      setVehiculos,
+      ordenes,
+      setOrdenes,
+    }}>
       {children}
     </AppContext.Provider>
   );
