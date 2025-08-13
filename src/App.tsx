@@ -1,20 +1,10 @@
 import React, { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppProvider } from './context/AppContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './pages/Dashboard';
 import { Clientes } from './pages/Clientes';
 import { OrdenesTrabajoList } from './pages/OrdenesTrabajoList';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -45,29 +35,27 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <div className="min-h-screen bg-gray-50 flex">
-          <Sidebar
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-            currentPath={currentPath}
-            onNavigate={setCurrentPath}
+    <AppProvider>
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          currentPath={currentPath}
+          onNavigate={setCurrentPath}
+        />
+        
+        <div className="flex-1 flex flex-col">
+          <Header 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
           
-          <div className="flex-1 flex flex-col">
-            <Header 
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
-            
-            <main className="flex-1 overflow-auto">
-              {renderCurrentPage()}
-            </main>
-          </div>
+          <main className="flex-1 overflow-auto">
+            {renderCurrentPage()}
+          </main>
         </div>
-      </AppProvider>
-    </QueryClientProvider>
+      </div>
+    </AppProvider>
   );
 }
 

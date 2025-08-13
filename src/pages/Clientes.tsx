@@ -1,51 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Car } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Search, Edit, Trash2, Car, Users } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Cliente, TipoDocumento } from '../packages/domain/entities/Cliente';
-import { ClienteService } from '../packages/application/services/ClienteService';
-import { ClienteRepository } from '../packages/infra/repositories/ClienteRepository';
+import { useAppContext } from '../context/AppContext';
 import { formatDate } from '../lib/utils';
 
-const clienteService = new ClienteService(new ClienteRepository());
-
 export function Clientes() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const { clientes } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadClientes();
-  }, []);
-
-  const loadClientes = async () => {
-    try {
-      setLoading(true);
-      const clientesData = await clienteService.getAll();
-      setClientes(clientesData);
-    } catch (error) {
-      console.error('Error cargando clientes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filteredClientes = clientes.filter(cliente =>
     cliente.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
     cliente.numeroDoc.includes(searchQuery) ||
     cliente.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Cargando clientes...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -120,7 +89,7 @@ export function Clientes() {
                 )}
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Registro:</span>
-                  <span className="text-sm">{formatDate(cliente.fechaRegistro)}</span>
+                  <span className="text-sm">{formatDate(new Date(cliente.fechaRegistro))}</span>
                 </div>
                 <div className="flex items-center justify-between pt-3 border-t">
                   <div className="flex items-center space-x-1 text-sm text-gray-600">
